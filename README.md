@@ -8,14 +8,16 @@
   <img alt="Repository size" src="https://img.shields.io/github/repo-size/MrHencke/INF122?color=56BEB8">
 </p>
 
-<br>
-
 ## About
 
 A repo for the course INF122 at UiB, autumn 2021.
+<br/>
 The repo contains weekly assignments, obligatory assigments and lecture notes.
+<br/>
 If you stumble upon this while taking the course, and it helps you, please give it a star.
 
 <br/>
 
-Made by <a align="center" href="https://github.com/MrHencke" target="_blank">Henrik</a>
+<p align="center">
+Made by <a href="https://github.com/MrHencke" target="_blank">Henrik</a>
+</p>
