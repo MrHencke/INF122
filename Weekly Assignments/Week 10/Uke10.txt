@@ -1,0 +1,197 @@
+
+Oppgave 1:
+pro x y = x
+pro = \x -> \y -> x
+
+Typeinferens:
+E(Ø | \x -> \y -> x :: t)
+(t4) => E( x :: a | \y -> x :: b) U {t = a -> b}
+(t4) => E( x :: a, y :: c | x :: d) U {t = a -> b, b = c -> d}
+(t2) => {t = a -> b, b = c -> d, d = a}
+
+Unifikasjon:
+{t = a -> b, b = c -> d, d = a}
+(u5) => {t = a -> b, b = c -> a, d = a}
+(u5) => {t = a -> c -> a, b = c -> a, d = a}
+
+    t = a -> c -> a
+
+
+Oppgave 2:
+pro 2 y = 2
+pro 2 = \y -> 2
+
+Typeinferens:
+E(Ø | \y -> 2 :: t)
+(t4) => E(y :: a | 2 :: b) U {t = a -> b}
+(t1) => {t = a -> b, b = Int}
+
+Unifikasjon:
+{t = a -> b, b = Int}
+(u5) => {t = a -> Int}
+t = a -> Int
+pro 2 :: a -> Int
+
+
+Oppgave 3:
+comp f g x = f (g x)
+comp = \f -> \g -> \x -> f (g x)
+
+Typeinferens:
+E(Ø | \f -> \g -> \x -> f (g x) :: t)
+(t4) => {t = a -> b} U E(f :: a | \g -> \x -> f (g x) :: b)
+(t4) => {t = a -> b, b = c -> d} U E(f :: a, g :: c | \x -> f (g x) :: d)
+(t4) => {t = a -> b, b = c -> d, d = e -> h} U E(f :: a, g :: c, x :: e | f (g x) :: h)
+(t3) => {t = a -> b, b = c -> d, d = e -> h} U E(f :: a, g :: c, x :: e | (g x) :: i) U E(f :: a, g :: c, x :: e | f :: i -> h)
+(t2) => {t = a -> b, b = c -> d, d = e -> h, i -> h = a} U E(f :: a, g :: c, x :: e | g x :: i)
+(t3) => {t = a -> b, b = c -> d, d = e -> h, i -> h = a} U E(f :: a, g :: c, x :: e  | g :: j -> i) U E(f :: a, g :: c, x :: e | x :: j)
+(t2) => {t = a -> b, b = c -> d, d = e -> h, i -> h = a, j = e} U E(f :: a, g :: c, x :: e | g :: j -> i)
+(t3) => {t = a -> b, b = c -> d, d = e -> h, i -> h = a, j = e} U E(f :: a, g :: c, x :: e | g :: j -> i)
+(t2) => {t = a -> b, b = c -> d, d = e -> h, i -> h = a, j = e, j -> i = c}
+    {t = a -> b, b = c -> d, d = e -> h, i -> h = a, j = e, j -> i = c}
+
+Unifikasjon:
+{t = a -> b, b = c -> d, d = e -> h, i -> h = a, j = e, j -> i = c}
+(u4) => {t = a -> b, b = c -> d, d = e -> h, a = i -> h, j = e, j -> i = c}
+(u4) => {t = a -> b, b = c -> d, d = e -> h, a = i -> h, j = e, c = j -> i}
+(u5) => {t = a -> b, b = j -> i -> d, d = e -> h, a = i -> h, j = e, c = j -> i}
+(u5) => {t = a -> b, b = j -> i -> e -> h, d = e -> h, a = i -> h, j = e, c = j -> i}
+(u5) => {t = a -> b, b = e -> i -> e -> h, d = e -> h, a = i -> h, j = e, c = j -> i}
+(u5) => {t = i -> h -> b, b = e -> i -> e -> h, d = e -> h, a = i -> h, j = e, c = j -> i}
+(u5) => {t = i -> h -> e -> i -> e -> h, b = e -> i -> e -> h, d = e -> h, a = i -> h, j = e, c = j -> i}
+
+t = i -> h -> e -> i -> e -> h
+comp :: (i -> h) -> (e -> i) -> e -> h
+
+
+Oppgave 4:
+\x -> \y -> x y
+
+Typeinferens:
+E(Ø | \x -> \y -> x y :: t)
+(t4) => {t = a -> b} E(x :: a | \y -> x y :: b)
+(t4) => {t = a -> b, b = c -> d} E(x :: a, y :: c | x y :: d)
+(t3) => {t = a -> b, b = c -> d} E(x :: a, y :: c | y :: e) U E(x :: a, y :: c | x :: e -> d)
+(t2) => {t = a -> b, b = c -> d, e -> d = a} E(x :: a, y :: c | y :: e)
+(t2) => {t = a -> b, b = c -> d, e -> d = a, e = c}
+
+Unifikasjon:
+{t = a -> b, b = c -> d, e -> d = a, e = c}
+(u4) = {t = a -> b, b = c -> d, a = e -> d, e = c}
+(u5) = {t = e -> f -> b, b = c -> d, a = e -> d, e = c}
+(u5) = {t = e -> f -> c -> d, b = c -> d, a = e -> d, e = c}
+Oppg4 :: (e -> d) -> c -> d
+
+Oppgave 5:
+\x -> \y -> (x y) x 
+
+Typeinferens:
+E(Ø | \x -> \y -> (x y) x :: t)
+(t4) => {t = a -> b} E(x :: a | \y -> (x y) x :: b)
+(t4) => {t = a -> b, b = c -> d} E(x :: a, y :: c | \y -> (x y) x :: d)
+(t3) => {t = a -> b, b = c -> d} E(x :: a, y :: c | x :: e) U E(x :: a, y :: c | (x y):: e -> d)
+(t3) => {t = a -> b, b = c -> d} E(x :: a, y :: c | x :: e) U E(x :: a, y :: c | y :: e) U E(x :: a, y :: c | x :: f -> e -> d)
+(t2) => {t = a -> b, b = c -> d, a = e} E(x :: a, y :: c | y :: e) U E(x :: a, y :: c | x :: f -> e -> d)
+(t2) => {t = a -> b, b = c -> d, a = e, c = e} E(x :: a, y :: c | x :: f -> e -> d)
+(t2) => {t = a -> b, b = c -> d, a = e, c = f, a = f -> e -> d}
+
+Unifikasjon:
+{t = a -> b, b = c -> d, a = e, c = f, a = f -> e -> d}
+(u5) => {a -> b, b = c -> d, a = e, c = f, e = f -> e -> d}
+(u6) => {a -> b, b = c -> d, a = e, c = f, e = f -> e -> d}
+TYPEFEIL: e = f -> e -> d
+
+Oppgave 6:
+\x -> \y -> x (y x)
+
+Typeinferens:
+E(Ø | \x -> \y -> x (y x) :: t)
+(t4) => {t = a -> b} E(x :: a | \y -> x (y x) :: b)
+(t4) => {t = a -> b, b = c -> d} E(x :: a, y = c | x (y x) :: d)
+(t3) => {t = a -> b, b = c -> d} E(x :: a, y = c | (y x) :: e) U E(x :: a, y = c | x :: e -> d)
+(t2) => {t = a -> b, b = c -> d, e -> d = a} E(x :: a, y = c | (y x) :: e) 
+(t3) => {t = a -> b, b = c -> d, e -> d = a} E(x :: a, y = c | x :: f) U E(x :: a, y = c | y :: f -> e)
+(t2) => {t = a -> b, b = c -> d, e -> d = a, f = a} E(x :: a, y = c | y :: f -> e)
+(t2) => {t = a -> b, b = c -> d, e -> d = a, f = a, f -> e = c }
+{t = a -> b, b = c -> d, e -> d = a, f = a, f -> e = c }
+
+Unifikasjon:
+{t = a -> b, b = c -> d, e -> d = a, f = a, f -> e = c}
+(u4) => {t = a -> b, b = c -> d, e -> d = a, f = a, c = f -> e}
+(u4) => {t = a -> b, b = c -> d, a = e -> d, f = a, c = f -> e}
+(u5) => {t = a -> b, b = c -> d, a = e -> d, f = a, c = a -> e}
+(u5) => {t = a -> b, b = c -> d, a = e -> d, f = a, c = e -> d -> e}
+(u5) => {t = a -> b, b = e -> d -> e -> d, a = e -> d, f = a, c = e -> d -> e}
+
+(u5) => {t = e -> d -> b, b = e -> d -> e -> d, a = e -> d, f = a, c = e -> d -> e}
+(u5) => {t = e -> d -> e -> d -> e -> d, b = e -> d -> e -> d, a = e -> d, f = a, c = e -> d -> e}
+t = (e -> d) -> ((e -> d) -> e) -> d
+
+Oppgave 7:
+\x -> \y -> x y x
+Typeinferens:
+E(Ø | \x -> \y -> (x y) x :: t) HUSK VENSTREASSOSIASJON
+(t4) => {t = a -> b} E(x :: a | \y -> x (y x) :: b)
+(t4) => {t = a -> b, b = c -> d} E(x :: a, y :: c | (x y) x :: d)
+(t3) => {t = a -> b, b = c -> d} E(x :: a, y :: c | x :: e) U E(x :: a, y :: c | x y  :: e -> d)
+(t2) => {t = a -> b, b = c -> d, e = a}  U E(x :: a, y :: c | x y  :: e -> d)
+(t3) => {t = a -> b, b = c -> d, e = a}  E(x :: a, y :: c | y  :: f )U E(x :: a, y :: c | x  :: f -> e -> d)
+(t2) => {t = a -> b, b = c -> d, e = a, f = c}  U E(x :: a, y :: c | x  :: f -> e -> d)
+(t2) => {t = a -> b, b = c -> d, e = a, f = c, f -> e -> d = a}
+{t = a -> b, b = c -> d, e = a, f = c, f -> e -> d = a}
+
+Unifikasjon:
+{t = a -> b, b = c -> d, e = a, f = c, f -> e -> d = a}
+(u4) => {t = a -> b, b = c -> d, e = a, f = c, a = f -> e -> d}
+(u5) => {t = a -> b, b = c -> d, e = a, f = c, e = f -> e -> d}
+(u6) => TYPEFEIL, e = f -> e -> d
+
+Oppgave 8:
+\x -> x (\y -> x y)
+Typeinferens:
+E(Ø | \x -> x (\y -> x y) :: t)
+(t4) => {t = a -> b} U E(x::a | x (\y -> x y) :: b)
+(t3) => {t = a -> b} U E(x::a | (\y -> x y) :: c) U E(x::a | x :: c -> b)
+(t2) => {t = a -> b, c -> b = a} U E(x::a | (\y -> x y) :: c)
+(t4) => {t = a -> b, c -> b = a, c = d -> e} U E(x::a, y::d | x y :: e)
+(t3) => {t = a -> b, c -> b = a, c = d -> e} U E(x::a, y::d | y :: f) U E(x::a, y::d | x :: f -> e)
+(t2) => {t = a -> b, c -> b = a, c = d -> e, f -> e = a} U E(x::a, y::d | y :: 
+f)
+(t2) => {t = a -> b, c -> b = a, c = d -> e, f -> e = a, f = d}
+Unifikasjon
+{t = a -> b, c -> b = a, c = d -> e, f -> e = a, f = d}
+(u4) => {t = a -> b, a = c -> b, c = d -> e, a = f -> e, f = d}
+(u5) =>  {t = a -> b, a = c -> b, c = d -> e, a = d -> e, f = d}
+(u5) =>  {t = d -> e -> b, d -> e = c -> b, c = d -> e, a = d -> e, f = d}
+(u5) =>  {t = d -> e -> b, d = c, e = b, c = d -> e, a = d -> e, f = d}
+(u5) =>  {t = d -> e -> b, d = d -> e, e = b, c = d -> e, a = d -> e, f = d}
+(u6) => Typefeil (d = d -> e)
+
+Oppgave 9:
+\x -> \y -> \z -> (x z) (y z)
+Typeinferens:
+E(Ø | \x -> \y -> \z -> (x z) (y z) :: a)
+(t4) => {t = a -> b} U E(x::a | \y -> \z -> (x z) (y z) :: b)
+(t4) => {t = a -> b, b = c -> d} U E(x::a, y :: c | \z -> (x z) (y z) :: d)
+(t4) => {t = a -> b, b = c -> d, d = e -> f} U E(x::a, y :: c, z :: e | (x z) (y z) :: f)
+(t3) => {t = a -> b, b = c -> d, d = e -> f} U E(x::a, y :: c, z :: e | (y z) :: g) U E(x::a, y :: c, z :: e | (x z) :: g -> f)
+(t3) => {t = a -> b, b = c -> d, d = e -> f} U E(x::a, y :: c, z :: e | (y z) :: g) U E(x::a, y :: c, z :: e | z :: h) U E(x::a, y :: c, z :: e | x :: h -> g -> f)
+(t2) => {t = a -> b, b = c -> d, d = e -> f, h = e } U E(x::a, y :: c, z :: e | (y z) :: g)U E(x::a, y :: c, z :: e | x :: h -> g -> f)
+(t2) => {t = a -> b, b = c -> d, d = e -> f, h = e, h -> g -> f = a} U E(x::a, y :: c, z :: e | (y z) :: g)
+(t3) => {t = a -> b, b = c -> d, d = e -> f, h = e, h -> g -> f = a} U E(x::a, y :: c, z :: e | z :: i) U E(x::a, y :: c, z :: e | y :: i -> g)
+(t2) => {t = a -> b, b = c -> d, d = e -> f, h = e, h -> g -> f = a, i = e}  U E(x::a, y :: c, z :: e | y :: i -> g)
+(t2) => {t = a -> b, b = c -> d, d = e -> f, h = e, h -> g -> f = a, i = e, i -> g = b}
+Unifikasjon:
+{t = a -> b, b = c -> d, d = e -> f, h = e, h -> g -> f = a, i = e, i -> g = c}
+(u4) => {t = a -> b, b = c -> d, d = e -> f, h = e, a = h -> g -> f, i = e, i -> g = c}
+(u4) => {t = a -> b, b = c -> d, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+(u5) => {t = a -> b, b = i -> g -> d, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+(u5) => {t = a -> b, b = i -> g -> e -> f, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+(u5) => {t = h -> g -> f -> b, b = i -> g -> e -> f, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+(u5) => {t = h -> g -> f -> i -> g -> e -> f, b = i -> g -> e -> f, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+(u5) => {t = e -> g -> f -> i -> g -> e -> f, b = i -> g -> e -> f, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+(u5) => {t = e -> g -> f -> e -> g -> e -> f, b = i -> g -> e -> f, d = e -> f, h = e, a = h -> g -> f, i = e, c = i -> g}
+t = e -> g -> f -> e -> g -> e -> f
+
+9 :: (e -> g -> f) -> (e -> g) -> e -> f
+

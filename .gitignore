@@ -1,2 +1,4 @@
 *.pdf
 *.rtf
+*.txt
+!Weekly Assignments/Week 10/Uke10.txt
